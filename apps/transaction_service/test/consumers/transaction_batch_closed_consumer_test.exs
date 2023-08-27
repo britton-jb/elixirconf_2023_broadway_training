@@ -5,7 +5,7 @@ defmodule TransactionService.TransactionBatchClosedConsumerTest do
   alias TransactionService.{Repo, Transaction, TransactionBatchClosedConsumer}
 
   setup do
-    message = Jason.encode!(%{item: "bananas", brand: "banana brand", amount: 123, department: "produce", category: "fruit", sku: "12345"})
+    message = Jason.encode!(%{item: "bananas", brand: "banana brand", amount: "123", department: "produce", category: "fruit", sku: "12345"})
     bad_message = Jason.encode!(%{item: "bananas", amount: 123, department: "produce", category: "fruit", sku: "12345"})
     {:ok, message: message, bad_message: bad_message}
   end

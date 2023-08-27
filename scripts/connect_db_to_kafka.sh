@@ -1,9 +1,9 @@
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d '
 {
-    "name": "vehicles-service-connector",
+    "name": "transactions-service-connector",
     "config": {
         "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
-        "database.dbname" : "vehicle_service",
+        "database.dbname" : "transaction_service",
         "database.hostname": "postgres",
         "database.password": "postgres",
         "database.port": "5432",

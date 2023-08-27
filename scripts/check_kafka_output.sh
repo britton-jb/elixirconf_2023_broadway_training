@@ -3,13 +3,13 @@ docker compose -p elixir-conf-2023-broadway-training \
     --bootstrap-server kafka:9092 \
     --from-beginning \
     --property print.key=true \
-    --topic postgres.public.vehicles
+    --topic postgres.public.transactions
 
 # docker run --tty \
 # --network elixirconf_2023_broadway_training \
 # confluentinc/cp-kafkacat \
 # kafkacat -b kafka:9092 -C \
-# -t postgres.public.vehicles
+# -t postgres.public.transactions
 
 ##
 # Example payload portion of output:
