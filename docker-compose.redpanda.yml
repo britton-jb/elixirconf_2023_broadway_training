@@ -18,31 +18,11 @@ services:
     volumes:
       - pg-debezium-data:/var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - 2181:2181
-      - 2888:2888
-      - 3888:3888
-
-  kafka:
-    image: bitnami/kafka
-    depends_on: [ zookeeper ]
-    ports:
-      - 9092:9092
-    links:
-      - zookeeper
-    environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
-
   redpanda:
     image: redpandadata/redpanda:v23.2.7
     ports:
-      - "9093:9092"
-      - "29093:29092"
+      - "9092:9092"
+      - "29092:29092"
     command:
       - redpanda
       - start
@@ -56,22 +36,21 @@ services:
       - --node-id
       - "0"
       - --kafka-addr
-      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9093
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
       - --advertise-kafka-addr
-      - PLAINTEXT://redpanda:29092,OUTSIDE://redpanda:9093
+      - PLAINTEXT://redpanda:29092,OUTSIDE://redpanda:9092
       - --check=false
-  # FIXME will I need the advertised kafka bit?
 
   connect:
     image: debezium/connect:2.3
-    depends_on: [ kafka, redpanda ]
+    depends_on: [ redpanda ]
     ports:
       - 8083:8083
     links:
-      - kafka
+      - redpanda
       - postgres
     environment:
-      - BOOTSTRAP_SERVERS=kafka:9092,redpanda:9093
+      - BOOTSTRAP_SERVERS=redpanda:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=connect_configs
       - OFFSET_STORAGE_TOPIC=connect_offsets

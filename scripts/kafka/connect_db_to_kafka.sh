@@ -11,6 +11,7 @@ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json"
         "database.user": "postgres",
         "schema.include.list": "public",
         "plugin.name": "pgoutput",
+        "topic.prefix": "transactions",
         "tasks.max": "1"
     }
 }'

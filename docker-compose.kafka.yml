@@ -38,40 +38,16 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
 
-  redpanda:
-    image: redpandadata/redpanda:v23.2.7
-    ports:
-      - "9093:9092"
-      - "29093:29092"
-    command:
-      - redpanda
-      - start
-      - --overprovisioned
-      - --smp
-      - "1"
-      - --memory
-      - "1G"
-      - --reserve-memory
-      - "0M"
-      - --node-id
-      - "0"
-      - --kafka-addr
-      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9093
-      - --advertise-kafka-addr
-      - PLAINTEXT://redpanda:29092,OUTSIDE://redpanda:9093
-      - --check=false
-  # FIXME will I need the advertised kafka bit?
-
   connect:
     image: debezium/connect:2.3
-    depends_on: [ kafka, redpanda ]
+    depends_on: [ kafka ]
     ports:
       - 8083:8083
     links:
       - kafka
       - postgres
     environment:
-      - BOOTSTRAP_SERVERS=kafka:9092,redpanda:9093
+      - BOOTSTRAP_SERVERS=kafka:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=connect_configs
       - OFFSET_STORAGE_TOPIC=connect_offsets
