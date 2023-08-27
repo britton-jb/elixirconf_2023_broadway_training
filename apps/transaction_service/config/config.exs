@@ -18,8 +18,8 @@ config :transaction_service,
        {BroadwayRabbitMQ.Producer, queue: "transaction_batch_closed", on_failure: :ack}
 
 config :transaction_service,
-       :driving_producer_module,
-       {BroadwayRabbitMQ.Producer, queue: "transaction_saved", on_failure: :ack}
+       :shipping_producer_module,
+       {BroadwayRabbitMQ.Producer, queue: "transaction_saved", on_failure: :reject_and_requeue}
 
 if config_env() == :test do
   import_config "#{config_env()}.exs"

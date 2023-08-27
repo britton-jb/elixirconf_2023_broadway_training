@@ -11,4 +11,4 @@ config :transaction_service, TransactionService.Repo,
 
 config :transaction_service, :naive_producer_module, {Broadway.DummyProducer, []}
 config :transaction_service, :producer_module, {Broadway.DummyProducer, []}
-config :transaction_service, :driving_producer_module, {Broadway.DummyProducer, []}
+config :transaction_service, :shipping_producer_module, {Broadway.DummyProducer, []}

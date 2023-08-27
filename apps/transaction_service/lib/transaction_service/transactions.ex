@@ -25,4 +25,22 @@ defmodule TransactionService.Transactions do
     {_rows, transactions} = Repo.insert_all(Transaction, transaction_maps, returning: true)
     {:ok, transactions}
   end
+
+  def update_all(transaction_maps) do
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    transaction_maps =
+      Enum.map(transaction_maps, fn transaction_map ->
+        Map.put(transaction_map, :updated_at, now)
+      end)
+
+    {_rows, transactions} =
+      Repo.insert_all(Transaction, transaction_maps,
+        returning: true,
+        on_conflict: :replace_all,
+        conflict_target: [:id]
+      )
+
+    {:ok, transactions}
+  end
 end

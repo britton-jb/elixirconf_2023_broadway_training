@@ -9,6 +9,7 @@ defmodule TransactionService.Repo.Migrations.AddTransactions do
       add :department, :string
       add :category, :string
       add :sku, :string
+      add :shipped_at, :naive_datetime
 
       timestamps()
     end
