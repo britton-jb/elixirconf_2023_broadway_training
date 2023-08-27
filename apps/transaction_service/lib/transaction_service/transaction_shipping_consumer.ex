@@ -9,7 +9,7 @@ defmodule TransactionService.TransactionShippingConsumer do
   alias TransactionService.{Transactions, Transaction, Shipper}
   alias Ecto.Changeset
 
-  def queue_name, do: "transaction_shipping"
+  def queue_name, do: "transaction_saved"
 
   def start_link(_opts) do
     Logger.info("STARTING SHIPPING CONSUMER")

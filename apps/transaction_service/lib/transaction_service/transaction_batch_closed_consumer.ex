@@ -5,7 +5,7 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
 
   alias AMQP.{Basic, Channel, Connection, Queue}
   alias Broadway.Message
-  alias TransactionService.{Transactions, Transaction}
+  alias TransactionService.{TransactionShippingConsumer, Transactions, Transaction}
 
   @queue_name "transaction_batch_closed"
   @failed_queue "transaction_batch_closed.dlq"
@@ -18,12 +18,14 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
     {:ok, channel} = Channel.open(connection)
     Queue.declare(channel, @queue_name)
     Queue.declare(channel, @failed_queue)
+    Queue.declare(channel, TransactionShippingConsumer.queue_name())
+    Connection.close(connection)
 
     Broadway.start_link(__MODULE__,
       name: TransactionService.TransactionBatchClosedConsumer,
-      producer: [module: producer_module],
-      processors: [default: [concurrency: 2]],
-      batchers: [default: [batch_size: 10]]
+      producer: [module: producer_module, concurrency: 100],
+      processors: [default: [concurrency: 500]],
+      batchers: [default: [batch_size: 5_000]]
     )
   end
 
@@ -34,8 +36,11 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
   def handle_message(_processor, %Message{data: transaction_batch_closed_json} = message, _context) do
     Logger.debug("Handling message #{inspect(transaction_batch_closed_json)}")
 
-    decoded_transaction_batch = Jason.decode!(transaction_batch_closed_json)
-    changeset = Transaction.insert_changeset(decoded_transaction_batch)
+    changeset =
+      transaction_batch_closed_json
+      |> Jason.decode!()
+      |> transform_message()
+      |> Transaction.insert_changeset()
 
     if changeset.valid? do
       now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
@@ -54,10 +59,15 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
     Logger.debug("Batcher: #{inspect(batcher)}")
     Logger.debug("Batch Info: #{inspect(batch_info)}")
 
-    {:ok, _transactions} =
+    {:ok, transactions} =
       messages
       |> Enum.map(& &1.data)
       |> Transactions.bulk_insert()
+
+    {:ok, connection} = Connection.open()
+    {:ok, channel} = Channel.open(connection)
+    Enum.each(transactions, &Basic.publish(channel, "", TransactionShippingConsumer.queue_name(), "#{&1.id}"))
+    Connection.close(connection)
 
     messages
   end
@@ -67,7 +77,31 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
     Logger.error("Failed: #{inspect(messages)}")
     {:ok, connection} = Connection.open()
     {:ok, channel} = Channel.open(connection)
-    Enum.each(messages, &Basic.publish(channel, "", @failed_queue, &1))
+    Enum.each(messages, &Basic.publish(channel, "", @failed_queue, &1.data))
+    Connection.close(connection)
     messages
+  end
+
+  defp transform_message(json) do
+    amount =
+      case Integer.parse(json["price_current"]) do
+        :error -> :error
+        {dollars, "." <> string_cents} when byte_size(string_cents) <= 2 ->
+          case Integer.parse(string_cents) do
+            :error -> :error
+            {cents, _} -> dollars * 100 + cents
+          end
+
+        _invalid_cents -> :error
+      end
+
+    %{
+      item: json["product_name"],
+      brand: json["brand"],
+      amount: amount,
+      department: json["department"],
+      category: json["category"],
+      sku: json["sku"]
+    }
   end
 end
