@@ -4,7 +4,7 @@ defmodule NotificationService.Notifications.Notification do
 
   schema "notifications" do
     field :idempotency_key, :string
-    field :type, Ecto.Enum, values: [vehicle: 1]
+    field :type, Ecto.Enum, values: [transaction: 1]
 
     timestamps()
   end

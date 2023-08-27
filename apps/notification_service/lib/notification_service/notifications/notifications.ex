@@ -31,7 +31,7 @@ defmodule NotificationService.Notifications do
   def delete_all_by_idempotency_key(idempotency_keys) do
     Notification
     |> where([n], n.idempotency_key in ^idempotency_keys)
-    |> where([n], n.type == :vehicle)
+    |> where([n], n.type == :transaction)
     |> Repo.delete_all()
   end
 

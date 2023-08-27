@@ -15,10 +15,7 @@ defmodule NotificationService.Notifications.NotificationConsumerTest do
         payload: %{
           after: %{
             id: 1,
-            current_x: 1,
-            current_y: 1,
-            start_x: 1,
-            start_y: 1
+            item: "bananas"
           }
         }
       })
@@ -33,10 +30,7 @@ defmodule NotificationService.Notifications.NotificationConsumerTest do
         payload: %{
           after: %{
             id: 2,
-            current_x: 2,
-            current_y: 2,
-            start_x: 2,
-            start_y: 2
+            item: "apples"
           }
         }
       })
@@ -81,7 +75,7 @@ defmodule NotificationService.Notifications.NotificationConsumerTest do
 
              assert_receive {:ack, ^ref, [%Message{data: %{idempotency_key: "12345-1"}}], []},
                             1000
-           end) =~ "Handling duplicate messages"
+           end) =~ "Handling 1 duplicate messages"
 
     assert Repo.aggregate(Notification, :count) == 1
   end
