@@ -23,7 +23,7 @@ defmodule TransactionBatcher.MixProject do
   defp deps do
     [
       {:amqp, "~> 3.1"},
-      {:csv, "~> 2.4"},
+      {:csv, "~> 3.0"},
       {:jason, "~> 1.3"},
       {:quantum, "~> 3.5"}
     ]
