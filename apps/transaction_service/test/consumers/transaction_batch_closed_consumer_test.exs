@@ -5,8 +5,41 @@ defmodule TransactionService.TransactionBatchClosedConsumerTest do
   alias TransactionService.{Repo, Transaction, TransactionBatchClosedConsumer}
 
   setup do
-    message = Jason.encode!(%{item: "bananas", brand: "banana brand", amount: "123", department: "produce", category: "fruit", sku: "12345"})
-    bad_message = Jason.encode!(%{item: "bananas", amount: 123, department: "produce", category: "fruit", sku: "12345"})
+    message = Jason.encode!(%{
+      "brand" => "Bolthouse Farms",
+      "breadcrumbs" => "Beverages/Orange Juice & Chilled",
+      "category" => "Orange Juice & Chilled",
+      "department" => "Beverages",
+      "index" => "15646",
+      "price_current" => "2.18",
+      "price_retail" => "2.18",
+      "product_name" => "Bolthouse Farms Perfectly Protein Mocha Cappuccino Coffee Drink, 11 oz",
+      "product_size" => "11",
+      "product_url" => "https://www.walmart.com/ip/Bolthouse-Farms-Perfectly-Protein-Mocha-Cappuccino-Coffee-Drink-11-oz/49065950?fulfillmentIntent=Pickup",
+      "promotion" => "",
+      "run_date" => "2022-09-11 21:20:04",
+      "shipping_location" => "89108",
+      "sku" => "49065950",
+      "subcategory" => "",
+      "tid" => "16179450"
+    })
+    bad_message = Jason.encode!(%{
+      "brand" => "Bolthouse Farms",
+      "breadcrumbs" => "Beverages/Orange Juice & Chilled",
+      "category" => "Orange Juice & Chilled",
+      "department" => "Beverages",
+      "index" => "15646",
+      "price_current" => "2.18",
+      "price_retail" => "2.18",
+      "product_name" => "Bolthouse Farms Perfectly Protein Mocha Cappuccino Coffee Drink, 11 oz",
+      "product_size" => "11",
+      "product_url" => "https://www.walmart.com/ip/Bolthouse-Farms-Perfectly-Protein-Mocha-Cappuccino-Coffee-Drink-11-oz/49065950?fulfillmentIntent=Pickup",
+      "promotion" => "",
+      "run_date" => "2022-09-11 21:20:04",
+      "shipping_location" => "89108",
+      "subcategory" => "",
+      "tid" => "16179450"
+    })
     {:ok, message: message, bad_message: bad_message}
   end
 

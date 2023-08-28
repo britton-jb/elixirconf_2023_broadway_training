@@ -11,7 +11,7 @@ defmodule TransactionService.Application do
       TransactionService.Repo,
       # TransactionService.NaiveTransactionBatchClosedConsumer
       TransactionService.TransactionBatchClosedConsumer,
-      # TransactionService.TransactionShippingConsumer
+      TransactionService.TransactionShippingConsumer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
