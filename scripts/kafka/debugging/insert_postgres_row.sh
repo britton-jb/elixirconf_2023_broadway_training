@@ -1,0 +1,1 @@
+psql -U postgres -p postgres --host localhost --port 5433 --dbname transaction_service -c "insert into transactions (item,brand,amount,department,category,sku,inserted_at,updated_at) values ('banana','banana brand',123,'produce','fruit','1234',now(),now());"

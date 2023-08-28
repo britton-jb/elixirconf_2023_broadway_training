@@ -28,7 +28,7 @@ services:
       - 3888:3888
 
   kafka:
-    image: bitnami/kafka
+    image: wurstmeister/kafka
     depends_on: [ zookeeper ]
     ports:
       - 9092:9092
@@ -71,7 +71,7 @@ services:
       - kafka
       - postgres
     environment:
-      - BOOTSTRAP_SERVERS=kafka:9092,redpanda:9093
+      - BOOTSTRAP_SERVERS=kafka:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=connect_configs
       - OFFSET_STORAGE_TOPIC=connect_offsets

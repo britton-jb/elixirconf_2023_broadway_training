@@ -1,5 +1,5 @@
 docker compose -p elixir-conf-2023-broadway-training \
-    exec kafka /opt/bitnami/kafka/bin/kafka-console-consumer.sh \
+    exec kafka /opt/kafka/bin/kafka-console-consumer.sh \
     --bootstrap-server kafka:9092 \
     --from-beginning \
     --property print.key=true \

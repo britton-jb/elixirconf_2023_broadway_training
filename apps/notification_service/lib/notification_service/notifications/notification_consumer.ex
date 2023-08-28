@@ -21,7 +21,7 @@ defmodule NotificationService.Notifications.NotificationConsumer do
         rate_limiting: [allowed_messages: 5, interval: 5000]
       ],
       processors: [default: [concurrency: 2]],
-      batchers: [default: [batch_size: 10], duplicate: [batch_size: 100]]
+      batchers: [default: [batch_size: 1000], duplicate: [batch_size: 100]]
     )
   end
 
@@ -104,6 +104,9 @@ defmodule NotificationService.Notifications.NotificationConsumer do
 
   @impl true
   def handle_failed(messages, _context) do
+    Enum.each(messages, fn message ->
+      Logger.error("Error while handling notification: #{inspect(message.status)}")
+    end)
     messages
     |> Enum.map(& &1.data.idempotency_key)
     |> Notifications.delete_all_by_idempotency_key()
