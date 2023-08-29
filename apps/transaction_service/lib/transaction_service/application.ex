@@ -9,6 +9,7 @@ defmodule TransactionService.Application do
   def start(_type, _args) do
     children = [
       TransactionService.Repo,
+      TransactionService.NaiveTransactionBatchClosedConsumer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
