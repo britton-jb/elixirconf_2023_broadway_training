@@ -32,7 +32,7 @@ case "$(uname -s)" in
       else
         echo "Installing dependencies with Homebrew"
         if [[ ! -e /Applications/Docker.app ]]; then
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install docker
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install docker --cask
         fi
         echo "Ensuring Docker is running"
         open -gj -a /Applications/Docker.app
