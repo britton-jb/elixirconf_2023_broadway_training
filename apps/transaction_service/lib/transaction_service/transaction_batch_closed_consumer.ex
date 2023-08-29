@@ -5,7 +5,7 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
 
   alias AMQP.{Basic, Channel, Connection, Queue}
   alias Broadway.Message
-  alias TransactionService.{Transactions, Transaction}
+  alias TransactionService.{TransactionShippingConsumer, Transactions, Transaction}
 
   @queue_name "transaction_batch_closed"
   @failed_queue "transaction_batch_closed.dlq"
@@ -18,6 +18,7 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
     {:ok, channel} = Channel.open(connection)
     Queue.declare(channel, @queue_name)
     Queue.declare(channel, @failed_queue)
+    Queue.declare(channel, TransactionShippingConsumer.queue_name())
     Connection.close(connection)
 
     Broadway.start_link(__MODULE__,
@@ -58,10 +59,15 @@ defmodule TransactionService.TransactionBatchClosedConsumer do
     Logger.debug("Batcher: #{inspect(batcher)}")
     Logger.debug("Batch Info: #{inspect(batch_info)}")
 
-    {:ok, _transactions} =
+    {:ok, transactions} =
       messages
       |> Enum.map(& &1.data)
       |> Transactions.bulk_insert()
+
+    {:ok, connection} = Connection.open()
+    {:ok, channel} = Channel.open(connection)
+    Enum.each(transactions, &Basic.publish(channel, "", TransactionShippingConsumer.queue_name(), "#{&1.id}"))
+    Connection.close(connection)
 
     messages
   end

@@ -10,7 +10,8 @@ defmodule TransactionService.Application do
     children = [
       TransactionService.Repo,
       # TransactionService.NaiveTransactionBatchClosedConsumer
-      TransactionService.TransactionBatchClosedConsumer
+      TransactionService.TransactionBatchClosedConsumer,
+      TransactionService.TransactionShippingConsumer
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
