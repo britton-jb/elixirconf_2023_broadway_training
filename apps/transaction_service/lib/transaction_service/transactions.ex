@@ -20,4 +20,9 @@ defmodule TransactionService.Transactions do
   def all() do
     Repo.all(Transaction)
   end
+
+  def bulk_insert(transaction_maps) do
+    {_rows, transactions} = Repo.insert_all(Transaction, transaction_maps, returning: true)
+    {:ok, transactions}
+  end
 end
