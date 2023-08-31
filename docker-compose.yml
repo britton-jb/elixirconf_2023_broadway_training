@@ -18,36 +18,39 @@ services:
     volumes:
       - pg-debezium-data:/var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+  redpanda:
+    image: redpandadata/redpanda
     ports:
-      - 2181:2181
-      - 2888:2888
-      - 3888:3888
-
-  kafka:
-    image: wurstmeister/kafka
-    depends_on: [ zookeeper ]
-    ports:
-      - 9092:9092
-    links:
-      - zookeeper
-    environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_HOST_NAME=host.docker.internal
+      - "9092:9092"
+      - "29092:29092"
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "1G"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://host.docker.internal:9092
+      - --check=false
 
   connect:
     image: debezium/connect:2.3
-    depends_on: [ kafka ]
+    depends_on: [ redpanda ]
     ports:
       - 8083:8083
     links:
-      - kafka
+      - redpanda
       - postgres
     environment:
-      - BOOTSTRAP_SERVERS=kafka:9092
+      - BOOTSTRAP_SERVERS=redpanda:9092
       - GROUP_ID=1
       - CONFIG_STORAGE_TOPIC=connect_configs
       - OFFSET_STORAGE_TOPIC=connect_offsets
